@@ -1,0 +1,53 @@
+{
+  "name": "boris-backend",
+  "version": "1.0.0",
+  "description": "Backend API для проекта BORIS",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "build": "echo 'No build step required for Node.js'",
+    "lint": "eslint src/",
+    "lint:fix": "eslint src/ --fix",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:migrate": "prisma migrate dev",
+    "db:seed": "node prisma/seed.js",
+    "db:studio": "prisma studio"
+  },
+  "keywords": ["boris", "transcription", "speechkit", "api"],
+  "author": "BORIS Team",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "helmet": "^7.1.0",
+    "morgan": "^1.10.0",
+    "winston": "^3.11.0",
+    "dotenv": "^16.3.1",
+    "jsonwebtoken": "^9.0.2",
+    "bcryptjs": "^2.4.3",
+    "multer": "^1.4.5-lts.1",
+    "prisma": "^5.6.0",
+    "@prisma/client": "^5.6.0",
+    "bull": "^4.12.0",
+    "redis": "^4.6.10",
+    "@yandex-cloud/nodejs-sdk": "^2.0.0",
+    "axios": "^1.6.2",
+    "joi": "^17.11.0",
+    "compression": "^1.7.4",
+    "express-rate-limit": "^7.1.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2",
+    "jest": "^29.7.0",
+    "supertest": "^6.3.3",
+    "eslint": "^8.55.0",
+    "@types/jest": "^29.5.8"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

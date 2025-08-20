@@ -1,0 +1,118 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Связи
+  audioFiles      AudioFile[]
+  transcriptions  Transcription[]
+  summaries       Summary[]
+  exportHistory   ExportHistory[]
+
+  @@map("users")
+}
+
+model AudioFile {
+  id          String   @id @default(cuid())
+  filename    String
+  originalName String
+  size        Int      // размер в байтах
+  duration    Int?     // длительность в секундах
+  format      String   // mp3, wav, m4a, ogg
+  path        String   // путь в Yandex Object Storage
+  status      String   @default("uploaded") // uploaded, processing, completed, error
+  
+  // Связи
+  userId        String @map("user_id")
+  user          User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transcriptions Transcription[]
+  
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("audio_files")
+}
+
+model Transcription {
+  id          String   @id @default(cuid())
+  status      String   @default("pending") // pending, processing, completed, failed
+  progress    Int      @default(0) // прогресс в процентах
+  text        String?  // результат транскрибации
+  speakers    Json?    // информация о спикерах
+  language    String   @default("ru") // язык
+  duration    Int?     // длительность в секундах
+  
+  // Связи
+  audioFileId String   @map("audio_file_id")
+  audioFile   AudioFile @relation(fields: [audioFileId], references: [id], onDelete: Cascade)
+  summaries   Summary[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  completedAt DateTime?
+
+  @@map("transcriptions")
+}
+
+model Summary {
+  id          String   @id @default(cuid())
+  agreements  Json     // договоренности
+  tasks       Json     // задачи и сроки
+  participants Json    // участники и их роли
+  decisions   Json     // основные решения
+  
+  // Связи
+  transcriptionId String @map("transcription_id")
+  transcription   Transcription @relation(fields: [transcriptionId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("summaries")
+}
+
+model ExportHistory {
+  id         String   @id @default(cuid())
+  format     String   // docx, pdf, txt
+  filename   String
+  fileSize   Int?     // размер экспортированного файла
+  
+  // Связи
+  userId     String   @map("user_id")
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  createdAt  DateTime @default(now())
+
+  @@map("export_history")
+}
+
+model Job {
+  id          String   @id @default(cuid())
+  type        String   // transcription, summary, export
+  status      String   @default("pending") // pending, active, completed, failed
+  data        Json     // данные задачи
+  result      Json?    // результат выполнения
+  error       String?  // сообщение об ошибке
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  startedAt   DateTime?
+  completedAt DateTime?
+
+  @@map("jobs")
+}
